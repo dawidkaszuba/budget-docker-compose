@@ -1,0 +1,51 @@
+version: "3.7"
+
+services:
+
+  config-server:
+    image: dawidkaszuba/config-server:latest
+    ports: 
+      - "8080:8080"
+    networks:
+      - dawidkaszuba-network
+
+  user-service:  
+    image: dawidkaszuba/user-service:latest
+    ports:
+      - "9002:9002"
+    networks: 
+      - dawidkaszuba-network
+    depends_on:
+      - config-server
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: CONFIG-SERVER:http://CONFIG-SERVER:8071/    
+
+  
+
+  expense-service:  
+    image: dawidkaszuba/expense-service:latest
+    ports:
+      - "9001:9001"
+    networks: 
+      - dawidkaszuba-network  
+    depends_on:
+      - config-server
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: CONFIG-SERVER:http://CONFIG-SERVER:8071/        
+
+networks:
+  dawidkaszuba-network:      
