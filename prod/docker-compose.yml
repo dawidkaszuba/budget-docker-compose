@@ -8,6 +8,8 @@ services:
       - "8071:8071"
     networks:
       - dawidkaszuba-network
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
 
   registry-service:  
     image: dawidkaszuba/registry-service:latest
@@ -46,7 +48,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/ 
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://registry-service:8070/eureka    
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka    
 
   
 
@@ -68,7 +70,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/  
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://registry-service:8070/eureka       
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka       
 
 networks:
   dawidkaszuba-network:      
