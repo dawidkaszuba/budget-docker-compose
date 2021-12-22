@@ -73,5 +73,29 @@ services:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/ 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
 
+  
+
+  gatewayserver:  
+    image: dawidkaszuba/gatewayserver:latest
+    ports:
+      - "8072:8072"
+    networks: 
+      - dawidkaszuba-network  
+    depends_on:
+      - config-server
+      - registry-service
+      - user-service
+      - expense-service
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 45s
+        max_attempts: 5
+        window: 180s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/ 
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
+
 networks:
   dawidkaszuba-network:      
