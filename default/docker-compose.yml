@@ -7,7 +7,7 @@ services:
     ports: 
       - "8071:8071"
     networks:
-      - dawidkaszuba-network
+      - homebudget-network
     environment:  
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
 
@@ -17,7 +17,7 @@ services:
     ports:
       - "8070:8070"
     networks: 
-      - dawidkaszuba-network
+      - homebudget-network
     depends_on:
       - config-server
     deploy:
@@ -30,35 +30,14 @@ services:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/     
 
-
-  user-service:  
-    image: dawidkaszuba/user-service:latest
-    ports:
-      - "9002:9002"
-    networks: 
-      - dawidkaszuba-network
-    depends_on:
-      - config-server
-      - registry-service
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 5
-        window: 120s
-    environment:
-      SPRING_PROFILES_ACTIVE: default
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/  
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
-
   
 
-  expense-service:  
-    image: dawidkaszuba/expense-service:latest
+  budgetservice:  
+    image: dawidkaszuba/budgetservice:latest
     ports:
       - "9001:9001"
     networks: 
-      - dawidkaszuba-network  
+      - homebudget-network  
     depends_on:
       - config-server
       - registry-service
@@ -73,6 +52,26 @@ services:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/ 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
 
+
+  reportservice:  
+    image: dawidkaszuba/reportservice:latest
+    ports:
+      - "9002:9002"
+    networks: 
+      - homebudget-network  
+    depends_on:
+      - config-server
+      - registry-service
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/ 
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/  
   
 
   gatewayserver:  
@@ -80,12 +79,12 @@ services:
     ports:
       - "8072:8072"
     networks: 
-      - dawidkaszuba-network  
+      - homebudget-network  
     depends_on:
       - config-server
       - registry-service
-      - user-service
-      - expense-service
+      - budgetservice
+      - reportservice
     deploy:
       restart_policy:
         condition: on-failure
@@ -98,4 +97,4 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
 
 networks:
-  dawidkaszuba-network:      
+  homebudget-network:      
