@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
 
-  config-server:
+  configserver:
     image: dawidkaszuba/config-server:latest
     ports: 
       - "8071:8071"
@@ -19,7 +19,7 @@ services:
     networks: 
       - homebudget-network
     depends_on:
-      - config-server
+      - configserver
     deploy:
       restart_policy:
         condition: on-failure
@@ -27,10 +27,17 @@ services:
         max_attempts: 5
         window: 120s
     environment:
-      SPRING_PROFILES_ACTIVE: default
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/     
+      SPRING_PROFILES_ACTIVE: deafult
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/    
 
-  
+  mysql:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: home_budget
+    ports:
+     - "3307:3306"  
 
   budgetservice:  
     image: dawidkaszuba/budgetservice:latest
@@ -39,17 +46,17 @@ services:
     networks: 
       - homebudget-network  
     depends_on:
-      - config-server
+      - configserver
       - registry-service
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
-        max_attempts: 5
-        window: 120s
+        max_attempts: 20
+        window: 300s
     environment:
-      SPRING_PROFILES_ACTIVE: default
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/ 
+      SPRING_PROFILES_ACTIVE: deafult
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/ 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
 
 
@@ -60,17 +67,17 @@ services:
     networks: 
       - homebudget-network  
     depends_on:
-      - config-server
+      - configserver
       - registry-service
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
-        max_attempts: 5
-        window: 120s
+        max_attempts: 20
+        window: 300s
     environment:
-      SPRING_PROFILES_ACTIVE: default
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/ 
+      SPRING_PROFILES_ACTIVE: deafult
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/ 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/  
   
 
@@ -81,19 +88,19 @@ services:
     networks: 
       - homebudget-network  
     depends_on:
-      - config-server
+      - configserver
       - registry-service
       - budgetservice
       - reportservice
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 45s
-        max_attempts: 5
-        window: 180s
+        delay: 5s
+        max_attempts: 20
+        window: 300s
     environment:
-      SPRING_PROFILES_ACTIVE: default
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/ 
+      SPRING_PROFILES_ACTIVE: deafult
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/ 
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-service:8070/eureka/
 
 networks:
